@@ -7,6 +7,29 @@ from kivy.uix.boxlayout import BoxLayout
 from kivy.uix.button import Button
 from kivy.uix.textinput import TextInput
 
+text_color = (143/255, 23/255, 15/255, 1)
+text_input_background = (255/255, 171/255, 92/255, 1)
+text_input_foreground = (123/255, 83/255, 166/255, 1)
+
+
+def my_label(text):
+    return Label(
+        text=text,
+        font_size=28,
+        color=text_color
+    )
+
+def my_text_input(hint, is_int=False):
+    return TextInput(
+        hint_text=hint,
+        font_size=20,
+        size_hint=(1, 0.2),
+        multiline=False,
+        input_filter="int" if is_int else None,
+        background_color = text_input_background,
+        foreground_color = text_input_foreground,
+        hint_text_color = text_color
+    )
 
 def calc_rufier(p1, p2, p3):
     return round((p1 + p2 + p3 - 200) / 10, 1)
@@ -16,10 +39,10 @@ class FirstScreen(Screen):
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
         layout = BoxLayout(orientation='vertical', spacing=10, padding=20)
-        layout.add_widget(Label(text="Ця програма дозволить вам пройти тест Руф'є.\nВведіть ім’я та вік:"))
+        layout.add_widget(my_label(text="Ця програма дозволить вам пройти тест Руф'є.\nВведіть ім’я та вік:"))
 
-        self.name_input = TextInput(hint_text="Ім'я")
-        self.age_input = TextInput(hint_text="Вік", input_filter='int')
+        self.name_input = my_text_input("Ім'я")
+        self.age_input = my_text_input("Вік", True)
 
         layout.add_widget(self.name_input)
         layout.add_widget(self.age_input)
@@ -31,6 +54,14 @@ class FirstScreen(Screen):
         self.add_widget(layout)
 
     def next_screen(self, instance):
+        if self.name_input.text == "" or self.age_input == "":
+            if self.name_input.text == "":
+                self.name_input.hint_text = "Введіть ім'я обов'язково!!!"
+                self.name_input.hint_text_color = (1, 0, 0, 1)
+            if self.age_input.text == "":
+                self.age_input.hint_text = "Введіть вік обов'язково!!!"
+                self.age_input.hint_text_color = (1, 0, 0, 1)
+            return
         app = App.get_running_app()
         app.user_name = self.name_input.text
         app.user_age = int(self.age_input.text)
@@ -44,12 +75,12 @@ class SecondScreen(Screen):
         self.elapsed = self.total_time
 
         layout = BoxLayout(orientation='vertical', spacing=10, padding=20)
-        layout.add_widget(Label(text="Виміряйте пульс за 15 секунд\nВведіть результат нижче:"))
+        layout.add_widget(my_label(text="Виміряйте пульс за 15 секунд\nВведіть результат нижче:"))
 
         self.progress = ProgressBar(max=self.total_time)
         layout.add_widget(self.progress)
 
-        self.p1_input = TextInput(hint_text="Пульс", input_filter='int')
+        self.p1_input = my_text_input("Пульс", True)
         layout.add_widget(self.p1_input)
 
         self.btn = Button(text="Розпочати")
@@ -75,6 +106,10 @@ class SecondScreen(Screen):
             self.btn.bind(on_press=self.next_screen)
 
     def next_screen(self, instance):
+        if self.p1_input.text == "":
+            self.p1_input.hint_text = "Введіть пульс обов'язково!!!"
+            self.p1_input.hint_text_color = (1, 0, 0, 1)
+            return
         App.get_running_app().p1 = int(self.p1_input.text)
         App.get_running_app().sm.current = 'third'
 
@@ -83,7 +118,7 @@ class ThirdScreen(Screen):
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
         layout = BoxLayout(orientation='vertical', spacing=10, padding=20)
-        layout.add_widget(Label(text="Виконайте 30 присідань за 45 секунд"))
+        layout.add_widget(my_label(text="Виконайте 30 присідань за 45 секунд"))
         self.total_time= 1
         self.elapsed = self.total_time
 
@@ -125,11 +160,11 @@ class FourthScreen(Screen):
         self.next = True
 
         layout = BoxLayout(orientation='vertical', spacing=10, padding=20)
-        layout.add_widget(Label(
+        layout.add_widget(my_label(
             text="Після присідань:\n- Заміряйте пульс за перші 15 секунд\n- Потім 15 секунд відпочинку\n- І знову пульс 15 секунд"))
 
-        self.p2_input = TextInput(hint_text="Перший пульс", input_filter='int')
-        self.p3_input = TextInput(hint_text="Другий пульс", input_filter='int')
+        self.p2_input = my_text_input("Перший пульс", True)
+        self.p3_input = my_text_input("Другий пульс", True)
 
         layout.add_widget(self.p2_input)
         layout.add_widget(self.p3_input)
@@ -145,11 +180,17 @@ class FourthScreen(Screen):
         self.p2_input.disabled = True
         self.p3_input.disabled = True
     def start_timer(self, instance):
+        if self.step == 2 and self.p2_input.disabled == False:
+            if self.p2_input.text == "":
+                self.p2_input.hint_text = "Введіть пульс обов'язково!!!"
+                self.p2_input.hint_text_color = (1, 0, 0, 1)
+                return
         self.btn.disabled = True
         self.p2_input.disabled = True
         self.p3_input.disabled = True
         self.next = True
         self.elapsed = self.total_time
+        Clock.unschedule(self.update_timer)
         Clock.schedule_interval(self.update_timer, 1)
 
     def update_timer(self, dt):
@@ -179,6 +220,11 @@ class FourthScreen(Screen):
 
 
     def next_screen(self, instance):
+        if self.step == 3 and self.p3_input.disabled == False:
+            if self.p3_input.text == "":
+                self.p3_input.hint_text = "Введіть пульс обов'язково!!!"
+                self.p3_input.hint_text_color = (1, 0, 0, 1)
+                return
         app = App.get_running_app()
         app.p2 = int(self.p2_input.text)
         app.p3 = int(self.p3_input.text)
