@@ -7,23 +7,24 @@ from kivy.uix.boxlayout import BoxLayout
 from kivy.uix.button import Button
 from kivy.uix.textinput import TextInput
 
-text_color = (143/255, 23/255, 15/255, 1)
-text_input_background = (255/255, 171/255, 92/255, 1)
-text_input_foreground = (123/255, 83/255, 166/255, 1)
+text_color = (2/255, 200/255, 214/255, 1)
+text_input_background = (140/255, 6/255, 6/255, 1)
+text_input_foreground = (0/255, 0/255, 0/255, 1)
 
 
 def my_label(text):
     return Label(
         text=text,
         font_size=28,
-        color=text_color
+        color=text_color,
+        halign="center"
     )
 
 def my_text_input(hint, is_int=False):
     return TextInput(
         hint_text=hint,
         font_size=20,
-        size_hint=(1, 0.2),
+        size_hint=(1, 0.4),
         multiline=False,
         input_filter="int" if is_int else None,
         background_color = text_input_background,
@@ -154,7 +155,7 @@ class ThirdScreen(Screen):
 class FourthScreen(Screen):
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
-        self.total_time = 15
+        self.total_time = 1
         self.elapsed = self.total_time
         self.step = 1
         self.next = True
@@ -234,7 +235,7 @@ class FourthScreen(Screen):
 class FifthScreen(Screen):
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
-        self.label = Label(text="", halign='center')
+        self.label = my_label(text="")
         layout = BoxLayout(orientation='vertical', padding=20)
         layout.add_widget(self.label)
         self.add_widget(layout)
