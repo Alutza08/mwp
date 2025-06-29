@@ -6,10 +6,14 @@ from kivy.uix.label import Label
 from kivy.uix.boxlayout import BoxLayout
 from kivy.uix.button import Button
 from kivy.uix.textinput import TextInput
+from kivy.uix.floatlayout import FloatLayout
+from kivy.graphics import Color, Rectangle
 
-text_color = (2/255, 200/255, 214/255, 1)
-text_input_background = (140/255, 6/255, 6/255, 1)
-text_input_foreground = (0/255, 0/255, 0/255, 1)
+
+background_color = (220/255, 233/255, 246/255, 1)
+text_color = (47/255, 79/255, 79/255, 1)
+text_input_background = (240/255, 248/255, 255/255, 1)
+text_input_foreground = (25/255, 25/255, 112/255, 1)
 
 
 def my_label(text):
@@ -23,7 +27,7 @@ def my_label(text):
 def my_text_input(hint, is_int=False):
     return TextInput(
         hint_text=hint,
-        font_size=20,
+        font_size=28,
         size_hint=(1, 0.4),
         multiline=False,
         input_filter="int" if is_int else None,
@@ -35,6 +39,15 @@ def my_text_input(hint, is_int=False):
 def calc_rufier(p1, p2, p3):
     return round((p1 + p2 + p3 - 200) / 10, 1)
 
+def with_background(widget, color):
+    layout = FloatLayout()
+    with layout.canvas.before:
+        Color(*color)
+        layout.rect = Rectangle(size=layout.size, pos=layout.pos)
+        layout.bind(size=lambda instance, value: setattr(layout.rect, 'size', value))
+        layout.bind(pos=lambda instance, value: setattr(layout.rect, 'pos', value))
+    layout.add_widget(widget)
+    return layout
 
 class FirstScreen(Screen):
     def __init__(self, **kwargs):
@@ -48,11 +61,13 @@ class FirstScreen(Screen):
         layout.add_widget(self.name_input)
         layout.add_widget(self.age_input)
 
+
         btn = Button(text="Почати")
         btn.bind(on_press=self.next_screen)
         layout.add_widget(btn)
 
-        self.add_widget(layout)
+        self.add_widget(with_background(layout, background_color))
+
 
     def next_screen(self, instance):
         if self.name_input.text == "" or self.age_input == "":
@@ -72,7 +87,7 @@ class FirstScreen(Screen):
 class SecondScreen(Screen):
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
-        self.total_time= 1
+        self.total_time= 15
         self.elapsed = self.total_time
 
         layout = BoxLayout(orientation='vertical', spacing=10, padding=20)
@@ -88,7 +103,7 @@ class SecondScreen(Screen):
         self.btn.bind(on_press=self.start_timer)
         layout.add_widget(self.btn)
 
-        self.add_widget(layout)
+        self.add_widget(with_background(layout, background_color))
         self.p1_input.disabled = True
     def start_timer(self, instance):
         self.btn.disabled = True
@@ -120,7 +135,7 @@ class ThirdScreen(Screen):
         super().__init__(**kwargs)
         layout = BoxLayout(orientation='vertical', spacing=10, padding=20)
         layout.add_widget(my_label(text="Виконайте 30 присідань за 45 секунд"))
-        self.total_time= 1
+        self.total_time= 15
         self.elapsed = self.total_time
 
 
@@ -131,7 +146,7 @@ class ThirdScreen(Screen):
         self.btn.bind(on_press=self.start_timer)
         layout.add_widget(self.btn)
 
-        self.add_widget(layout)
+        self.add_widget(with_background(layout, background_color))
 
     def start_timer(self, instance):
         self.btn.disabled = True
@@ -155,7 +170,7 @@ class ThirdScreen(Screen):
 class FourthScreen(Screen):
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
-        self.total_time = 1
+        self.total_time = 15
         self.elapsed = self.total_time
         self.step = 1
         self.next = True
@@ -177,7 +192,7 @@ class FourthScreen(Screen):
         self.btn.bind(on_press=self.start_timer)
         layout.add_widget(self.btn)
 
-        self.add_widget(layout)
+        self.add_widget(with_background(layout, background_color))
         self.p2_input.disabled = True
         self.p3_input.disabled = True
     def start_timer(self, instance):
@@ -238,7 +253,7 @@ class FifthScreen(Screen):
         self.label = my_label(text="")
         layout = BoxLayout(orientation='vertical', padding=20)
         layout.add_widget(self.label)
-        self.add_widget(layout)
+        self.add_widget(with_background(layout, background_color))
 
     def on_enter(self):
         app = App.get_running_app()
